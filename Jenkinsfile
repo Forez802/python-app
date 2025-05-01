@@ -1,19 +1,33 @@
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Codigo clonado'
+                git branch: 'main', url: 'https://github.com/Forez802/python-app.git'
             }
         }
-        stage('Test') {
+
+        stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
-                sh 'pytest --junitxml=test-results.xml'
+                script {
+                    sh 'pip install -r requirements.txt'
+                }
             }
-            post {
-                always {
-                    junit 'test-results.xml'
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh 'pytest'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    sh 'python setup.py install'
                 }
             }
         }
