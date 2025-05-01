@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Forez802/python-app.git'
+                git branch: 'master', url: 'https://github.com/Forez802/python-app.git'
             }
         }
 
