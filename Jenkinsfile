@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10'  // Usa una versión que soporte tu proyecto
+            args '-u root'
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -10,25 +15,19 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    sh 'pip install -r requirements.txt'
-                }
+                sh 'pip install -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
-                script {
-                    sh 'pytest'
-                }
+                sh 'pytest'
             }
         }
 
         stage('Build') {
             steps {
-                script {
-                    sh 'python setup.py install'
-                }
+                sh 'python setup.py install'
             }
         }
     }
