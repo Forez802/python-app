@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'agent-any' }
+    agent { label 'python-agent' }
 
     stages {
         stage('Checkout') {
