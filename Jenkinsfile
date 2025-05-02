@@ -8,32 +8,34 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Verify Python') {
             steps {
-                script {
-                    // Crear un entorno virtual y activarlo
-                    sh 'python3 -m venv venv'
-                    sh '. venv/bin/activate && pip install -r requirements.txt'
-                }
+                sh 'which python3'
+                sh 'python3 --version'
             }
         }
 
-        stage('Run Tests') {
+        stage('Install') {
             steps {
-                script {
-                    // Ejecutar pruebas en el entorno virtual
-                    sh '. venv/bin/activate && pytest'
-                }
+                sh 'python3 -m pip install --upgrade pip --break-system-packages'
+                sh 'pip install -r requieremts.txt --break-system-packages'
             }
         }
 
-        stage('Build') {
+        stage('Test') {
             steps {
-                script {
-                    // Realizar la construcción en el entorno virtual
-                    sh '. venv/bin/activate && python setup.py install'
-                }
+                sh '''
+                    export PATH=$PATH:/home/jenkins/.local/bin
+                    pytest --html=report.html
+                '''
+
             }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'report.html', fingerprint: true
         }
     }
 }
