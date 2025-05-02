@@ -1,34 +1,41 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.10'  // Usa una versión que soporte tu proyecto
-            args '-u root'
-        }
-    }
+    agent { label 'python-agent' }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/Forez802/python-app.git'
+                git branch: 'main', url: 'https://github.com/Forez802/python-app.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Verify Python') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'which python3'
+                sh 'python3 --version'
             }
         }
 
-        stage('Run Tests') {
+        stage('Install') {
             steps {
-                sh 'pytest'
+                sh 'python3 -m pip install --upgrade pip --break-system-packages'
+                sh 'pip install -r requieremts.txt --break-system-packages'
             }
         }
 
-        stage('Build') {
+        stage('Test') {
             steps {
-                sh 'python setup.py install'
+                sh '''
+                    export PATH=$PATH:/home/jenkins/.local/bin
+                    pytest --html=report.html
+                '''
+
             }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'report.html', fingerprint: true
         }
     }
 }
