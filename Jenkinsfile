@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'python-agent' }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -8,34 +8,28 @@ pipeline {
             }
         }
 
-        stage('Verify Python') {
+        stage('Install Dependencies') {
             steps {
-                sh 'which python3'
-                sh 'python3 --version'
+                script {
+                    sh 'pip install -r requirements.txt'
+                }
             }
         }
 
-        stage('Install') {
+        stage('Run Tests') {
             steps {
-                sh 'python3 -m pip install --upgrade pip --break-system-packages'
-                sh 'pip install -r requieremts.txt --break-system-packages'
+                script {
+                    sh 'pytest'
+                }
             }
         }
 
-        stage('Test') {
+        stage('Build') {
             steps {
-                sh '''
-                    export PATH=$PATH:/home/jenkins/.local/bin
-                    pytest --html=report.html
-                '''
-
+                script {
+                    sh 'python setup.py install'
+                }
             }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: 'report.html', fingerprint: true
         }
     }
 }
