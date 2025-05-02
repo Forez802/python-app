@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'agent1' }  // Esto especifica que se debe usar el agente con la etiqueta 'agent1'
+    agent { label 'agent1' }
 
     stages {
         stage('Checkout') {
@@ -11,7 +11,9 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'pip install -r requirements.txt'
+                    // Crear un entorno virtual y activarlo
+                    sh 'python3 -m venv venv'
+                    sh '. venv/bin/activate && pip install -r requirements.txt'
                 }
             }
         }
@@ -19,7 +21,8 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh 'pytest'
+                    // Ejecutar pruebas en el entorno virtual
+                    sh '. venv/bin/activate && pytest'
                 }
             }
         }
@@ -27,7 +30,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'python setup.py install'
+                    // Realizar la construcción en el entorno virtual
+                    sh '. venv/bin/activate && python setup.py install'
                 }
             }
         }
