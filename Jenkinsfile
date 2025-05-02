@@ -1,10 +1,10 @@
 pipeline {
-    agent any
+    agent { label 'agent1' }  // Esto especifica que se debe usar el agente con la etiqueta 'agent1'
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Forez802/python-app.git'
+                git branch: 'master', url: 'https://github.com/Forez802/python-app.git'
             }
         }
 
