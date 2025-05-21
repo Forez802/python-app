@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  python-app:
+    build: .
+    container_name: python-app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sumadb
+      MYSQL_USER: sumauser
+      MYSQL_PASSWORD: sumapass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  locust:
+    image: locustio/locust
+    container_name: locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --host=http://python-app:5000
+    depends_on:
+      - python-app
+
+volumes:
+  mysql-data:
